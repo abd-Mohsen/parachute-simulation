@@ -9,7 +9,6 @@ const outputPanel = new dat.GUI();
 const input = {
     altitude_m: 0,
     mass_kg: 69,
-    parachuteMass_kg: 11,
 };
 
 const output = {
@@ -17,23 +16,24 @@ const output = {
   y_m: input.altitude_m,
   x_m: 0.0,
   skydiverStatus: "sky diving",
+  time_s: 0.0,
 }
 
 //لوحة الدخل
 inputPanel.add(input,'altitude_m', 1000, 4572); //3048m to 4572m irl
-inputPanel.add(input,'mass_kg', 0, 100);
-inputPanel.add(input,'parachuteMass_kg', 7, 11);
+inputPanel.add(input,'mass_kg', 40, 120);
 
 //لوحة الخرج
 outputPanel.add(output,'velocity_mps');
 outputPanel.add(output,'y_m');
 outputPanel.add(output,'x_m');
 outputPanel.add(output,'skydiverStatus');
+outputPanel.add(output,'time_s');
 outputPanel.hide();
 
 //scene
 const scene = new THREE.Scene();
-scene.background = new THREE.TextureLoader().load("./sky2.jpg");
+scene.background = new THREE.TextureLoader().load("sky2.jpg");
 
 //camera
 const camera = new THREE.OrthographicCamera(1366/-2, 1366/2, 768/2, 768/-2, 0.1, 200);
@@ -55,7 +55,7 @@ scene.add(helicopter);
 helicopter.position.set(-200, 30, -200);
 
 //ground
-const ground = new THREE.Mesh(new THREE.BoxGeometry(1366, 10, 400), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ));
+const ground = new THREE.Mesh(new THREE.BoxGeometry(1366, 10, 50), new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('grsass.jpg')}));
 scene.add(ground);
 ground.position.set(0,-10,-200);
 
@@ -121,16 +121,20 @@ function animate() {
     input.altitude_m -= output.velocity_mps/3;
     output.y_m = input.altitude_m;
     skydiver.position.set(-200, output.y_m, -200);
+
     if(output.velocity_mps <= 55){
       output.velocity_mps += 20/60;
     }
+
     if(output.y_m > 200){
       camera.position.y = input.altitude_m - 20;
     }
+
     if(output.y_m < 0){
       output.y_m = 0;
       skydiver.position.set(-200, output.y_m, -200);
     }
+    output.time_s += 1/60;
   } 
   outputPanel.updateDisplay();
 }
