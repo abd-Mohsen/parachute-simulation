@@ -20,7 +20,7 @@ const output = {
 }
 
 //لوحة الدخل
-inputPanel.add(input,'altitude_m', 3048, 4572);
+inputPanel.add(input,'altitude_m', 1000, 4572); //3048m to 4572m irl
 inputPanel.add(input,'mass_kg', 0, 100);
 inputPanel.add(input,'parachuteMass_kg', 7, 11);
 
@@ -33,6 +33,7 @@ outputPanel.hide();
 
 //scene
 const scene = new THREE.Scene();
+scene.background = new THREE.TextureLoader().load("./sky2.jpg");
 
 //camera
 const camera = new THREE.OrthographicCamera(1366/-2, 1366/2, 768/2, 768/-2, 0.1, 200);
@@ -42,10 +43,6 @@ camera.position.set(0,200,20);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( 1366, 768 );
 document.body.appendChild( renderer.domElement );
-
-// 2D background 
-const textureLoader = new THREE.TextureLoader().load("./sky2.jpg");
-scene.background = textureLoader;
 
 //skydiver aka red box
 const skydiver = new THREE.Mesh( new THREE.BoxGeometry( 50, 10, 50 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
@@ -121,16 +118,18 @@ function animate() {
   handleKeyboardInput();
   
   if(input.altitude_m > 0 && isSimRunning ){
-    input.altitude_m -= output.velocity_mps/60;
-    skydiver.position.set(-200, input.altitude_m, -200);
-    //if(output.y_m != 0){
-      output.y_m = input.altitude_m;
-    //}
+    input.altitude_m -= output.velocity_mps/3;
+    output.y_m = input.altitude_m;
+    skydiver.position.set(-200, output.y_m, -200);
     if(output.velocity_mps <= 55){
       output.velocity_mps += 20/60;
     }
     if(output.y_m > 200){
       camera.position.y = input.altitude_m - 20;
+    }
+    if(output.y_m < 0){
+      output.y_m = 0;
+      skydiver.position.set(-200, output.y_m, -200);
     }
   } 
   outputPanel.updateDisplay();
