@@ -33,6 +33,13 @@ outputPanel.add(output,'status');
 outputPanel.add(output,'time_s');
 outputPanel.hide();
 
+const g = 9.81; // m/s^2 
+let w = input.mass_kg*g;
+let k = 1 ; // for an average skydiver in a belly-to-earth position
+let s = 0.8 // for an average skydiver in a belly-to-earth position
+let rho = 1.225 * Math.pow((1 - 0.0065 * input.altitude_m / 288.15), (9.81 / (287.05 * 0.0065) - 1));
+let F_air = 1/2* rho * output.velocity_mps * k * s;
+
 //scene
 const scene = new THREE.Scene();
 scene.background = new THREE.TextureLoader().load("sky2.jpg");
@@ -122,24 +129,11 @@ function animate() {
   handleKeyboardInput();
   
   if(input.altitude_m > 0 && isSimRunning ){
-    const g = 9.81; // m/s^2 
-    // let w = input.mass_kg*g;
-    // let k = 1 ; // for an average skydiver in a belly-to-earth position
-    // let s = 0.8 // for an average skydiver in a belly-to-earth position
-    // let rho = 1.225 * Math.pow((1 - 0.0065 * input.altitude_m / 288.15), (9.81 / (287.05 * 0.0065) - 1));
-    // F_air = 1/2* rho * output.velocity_mps * k * s;
-    // k1 = 1 for an average skydiver in a belly-to-earth position
-    // k2 = 0.5 for an average rounded parachute
-    // s1 = 0.8 for an average skydiver in a belly-to-earth position
-    // s2 = 25  for an average rounded parachute
-    // rho = 1.225 * (1 - 0.0065 * input.altitude_m / 288.15)^(9.81 / (287.05 * 0.0065) - 1)
-
     output.y_m = input.altitude_m - 0.5*g*Math.pow(output.time_s,2); // h = 1/2.g.t^2
     skydiver.position.y= output.y_m;
 
-    //if(output.velocity_mps <= 55){
-      output.velocity_mps = g*output.time_s; // v = g.t
-    //}
+    output.velocity_mps = g*output.time_s; // v = g.t
+    
     if(output.y_m > 200){
       camera.position.y = output.y_m - 20;
     }
@@ -148,12 +142,18 @@ function animate() {
       skydiver.position.y= output.y_m;
       //cancelAnimationFrame(animationId);
     }
-    output.time_s += 1/60;
+    if(output.y_m > 0){
+      output.time_s += 1/60;
+    }
   } 
   outputPanel.updateDisplay();
 }
 
 animate();
+
+// k = 1 for an average skydiver in a belly-to-earth position | k = 0.5 for an average rounded parachute
+// s = 0.8 for an average skydiver in a belly-to-earth position | s = 25  for an average rounded parachute
+// rho = 1.225 * (1 - 0.0065 * input.altitude_m / 288.15)^(9.81 / (287.05 * 0.0065) - 1)
 
 
 
