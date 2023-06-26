@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
-//محسن مر من هنا 
+
 let isSimRunning = false;
 
 let isParachuteOpened = false;
@@ -40,6 +40,7 @@ let k = 1 ; // for an average skydiver in a belly-to-earth position
 let s = 0.8 // for an average skydiver in a belly-to-earth position
 let rho = 1.225 * Math.pow((1 - 0.0065 * input.altitude_m / 288.15), (9.81 / (287.05 * 0.0065) - 1));
 let F_air = 1/2* rho * output.velocity_mps * k * s;
+// rho = 1.225 * (1 - 0.0065 * y(t)/288.15) ^ (g / (287.05 * 0.0065) - 1)
 
 //scene
 const scene = new THREE.Scene();
@@ -70,13 +71,6 @@ const ground = new THREE.Mesh(new THREE.BoxGeometry(1366, 10, 50), new THREE.Mes
 scene.add(ground);
 ground.position.set(0,-10,-200);
 
-
-function updateSpeed(speed){
-  if(output.velocity_mps <= 55){
-    //
-  }
-
-}
 
 function openParachute() {
   isParachuteOpened = true;
@@ -136,13 +130,11 @@ function animate() {
 
     output.velocity_mps = g*output.time_s; // v = g.t
     
-    if(output.y_m > 200){
-      camera.position.y = output.y_m - 20;
-    }
+    if(output.y_m > 200) camera.position.y = output.y_m - 20;
+    
     if(output.y_m < 0){
       output.y_m = 0;
       skydiver.position.y= output.y_m;
-      //cancelAnimationFrame(animationId);
     }
     if(output.y_m > 0){
       output.time_s += 1/60;
@@ -153,6 +145,14 @@ function animate() {
 }
 
 animate();
+
+
+
+
+
+
+
+
 
 //make the canvas responsive
 window.addEventListener('resize', function () {
