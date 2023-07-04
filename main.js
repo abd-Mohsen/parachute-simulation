@@ -34,7 +34,7 @@ outputPanel.add(output, 'x_m');
 outputPanel.add(output, 'status');
 outputPanel.add(output, 'time_s');
 outputPanel.hide();
-let h0=1066;
+let h0=input.altitude_m;
 const g = 9.81; // m/s^2 
 let w = input.mass_kg*g;
 let k = 1 ; // for an average skydiver in a belly-to-earth position
@@ -133,13 +133,18 @@ function handleKeyboardInput() {
     isSimRunning = true;
     inputPanel.hide();
     outputPanel.domElement.style.display = "block";
-    helicopter.position.y = input.altitude_m;
+    skydiver.position.y=input.altitude_m;
+    helicopter.position.y = input.altitude_m; 
+    camera.position.y=input.altitude_m;
+    h0=input.altitude_m;
+    y=input.altitude_m;
   }
 
   if (keyboard['KeyQ']) {
     openParachute();
   }
 }
+let acc=0;
 
 //function that repeats 60 times every second
 function animate() {
@@ -147,9 +152,13 @@ function animate() {
   renderer.render(scene, camera);
   handleKeyboardInput();
   
-  if(input.altitude_m > 0 && isSimRunning ){
+  if(input.altitude_m > 0 && isSimRunning && y>0){
     
     a = forces(drag(rho(y0), v0, k, s), w) / input.mass_kg;
+    console.log("t="+output.time_s);
+    acc=acc+1;
+    console.log("acc="+acc);
+
     output.velocity_mps = v0 + (a * 0.016);
    y= h0 - (y0 +( output.velocity_mps * 0.016));
     console.log("a = "+ a);
