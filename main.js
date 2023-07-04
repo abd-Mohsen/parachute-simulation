@@ -6,7 +6,7 @@ let isSimRunning = false;
 
 let isParachuteOpened = false;
 
-const inputPanel = new dat.GUI({width: 400});
+const inputPanel = new dat.GUI({width:1220});
 const outputPanel = new dat.GUI();
 
 const input = {
@@ -24,7 +24,12 @@ const output = {
 
 
 //لوحة الدخل
-inputPanel.add(input, 'altitude_m', 1066, 5486); //1066m to 5486m irl
+inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).onChange(()=>{
+skydiver.position.y=input.altitude_m;
+helicopter.position.y=input.altitude_m;
+camera.position.y=input.altitude_m;
+
+}); //1066m to 5486m irl
 inputPanel.add(input, 'mass_kg', 40, 120);
 
 //لوحة الخرج
