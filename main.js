@@ -11,7 +11,7 @@ const input = {
     altitude_m: 0,
     mass_kg:40,
     roh_parachute:1.1,
-    radius_parachute:1,
+    radius_parachute:50,
     k:0.7,
     gravity:9.81,
 };
@@ -32,7 +32,7 @@ helicopter.position.y=input.altitude_m;
 camera.position.y=input.altitude_m;
 
 }); //1066m to 5486m irl
-inputPanel.add(input,'radius_parachute',1,4).step(1);
+inputPanel.add(input,'radius_parachute',50,450).step(1);
 inputPanel.add(input,'roh_parachute',1.1,2.6).step(0.1),
 inputPanel.add(input,'k',0.7,1.4).step(0.1),
 inputPanel.add(input, 'mass_kg', 40, 120);
@@ -55,7 +55,7 @@ let m_parachute=10;
 let m_total=50;
 let k = 1 ;
 let roh_parachute=2;
-let s = 0.1;
+let s = 0.36;
 let radius=10 ;
 let a = 0;
 let y0 = 0;
@@ -66,7 +66,7 @@ let w=10;
 
 //scene
 const scene = new THREE.Scene();
-scene.background = new THREE.TextureLoader().load("sky2.jpg");
+
 
 //camera
 const camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 200);
@@ -88,21 +88,25 @@ helicopter.position.set(-200, h0, 0);
 const skydiver = new THREE.Mesh( new THREE.BoxGeometry( 2, 1 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
 scene.add(skydiver);
 skydiver.position.set(-200, h0, 0);
+//box
+const sky = new THREE.Mesh( new THREE.BoxGeometry( window.innerWidth, window.innerHeight*15,30), new THREE.MeshBasicMaterial( {map: new THREE.TextureLoader().load('pz.png')} ) );
+scene.add(sky);
+sky.position.set(-200, h0, -100);
 
 //ground
-const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 15, 50), new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('grsass.jpg')}));
+const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 35, 30), new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('grass1.png')}));
 scene.add(ground);
-ground.position.set(0,-15/2,-200);
+ground.position.set(0,-35/2,-100);
 
 
 
 //حساب مساحة المظلة 
 function swathe_parachute (radius){
-  return (3.14*radius*radius);
+  return (3.14*radius*radius)/10000;
 }
 //حساب حجم المظلة 
 function volume_parachute(radius){
-  return ((2/3)*3.14*radius*radius*radius);
+  return ((2/3)*3.14*radius*radius*radius)/1000000;
 }
 //حساب كتلة المظلة 
 function m_parachutee(roh,radius){
@@ -154,7 +158,8 @@ function handleKeyboardInput() {
     radius=input.radius_parachute;
     //حساب الكتلة الكلية
     m_parachute=m_parachutee(roh_parachute,radius);
-    m_total=(m_parachute/1000) + m_skydriver;
+    m_total=(m_parachute) + m_skydriver;
+    console.log('m='+m_total);
 //حساب قوة الثقل 
    w = m_total*g;
   }
