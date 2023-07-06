@@ -2,16 +2,18 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
 
-let isSimRunning = false;
 
-let isParachuteOpened = false;
 
-const inputPanel = new dat.GUI({width: 400});
+const inputPanel = new dat.GUI({width:1220});
 const outputPanel = new dat.GUI();
 
 const input = {
     altitude_m: 0,
-    mass_kg: 69,
+    mass_kg:40,
+    roh_parachute:1.1,
+    radius_parachute:50,
+    k:0.7,
+    gravity:9.81,
 };
 
 const output = {
@@ -24,8 +26,17 @@ const output = {
 
 
 //لوحة الدخل
-inputPanel.add(input, 'altitude_m', 1066, 5486); //1066m to 5486m irl
+inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).onChange(()=>{
+skydiver.position.y=input.altitude_m;
+helicopter.position.y=input.altitude_m;
+camera.position.y=input.altitude_m;
+
+}); //1066m to 5486m irl
+inputPanel.add(input,'radius_parachute',50,450).step(1);
+inputPanel.add(input,'roh_parachute',1.1,2.6).step(0.1),
+inputPanel.add(input,'k',0.7,1.4).step(0.1),
 inputPanel.add(input, 'mass_kg', 40, 120);
+inputPanel.add(input,'gravity',0,20).step(0.1);
 
 //لوحة الخرج
 outputPanel.add(output, 'velocity_mps');
@@ -34,23 +45,28 @@ outputPanel.add(output, 'x_m');
 outputPanel.add(output, 'status');
 outputPanel.add(output, 'time_s');
 outputPanel.hide();
-let h0=1066;
-const g = 9.81; // m/s^2 
-let w = input.mass_kg*g;
-let k = 1 ; // for an average skydiver in a belly-to-earth position
-let s = 25; // for an average skydiver in a belly-to-earth position
-//let rho = 1.225 * Math.pow((1 - 0.0065 * input.altitude_m / 288.15), (9.81 / (287.05 * 0.0065) - 1));
-//let drag = 1/2* rho * output.velocity_mps * k * s;
-// rho = 1.225 * (1 - 0.0065 * y(t)/288.15) ^ (g / (287.05 * 0.0065) - 1)
+
+let isSimRunning = false;
+let isParachuteOpened = false;
+let h0=input.altitude_m;
+let g = 9.81; // m/s^2 
+let m_skydriver = input.mass_kg;
+let m_parachute=10;
+let m_total=50;
+let k = 1 ;
+let roh_parachute=2;
+let s = 0.36;
+let radius=10 ;
 let a = 0;
 let y0 = 0;
 let v0 = 0;
 let v=0;
 let y=h0;
+let w=10;
 
 //scene
 const scene = new THREE.Scene();
-scene.background = new THREE.TextureLoader().load("sky2.jpg");
+
 
 //camera
 const camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 200);
@@ -72,31 +88,45 @@ helicopter.position.set(-200, h0, 0);
 const skydiver = new THREE.Mesh( new THREE.BoxGeometry( 2, 1 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
 scene.add(skydiver);
 skydiver.position.set(-200, h0, 0);
+//box
+const sky = new THREE.Mesh( new THREE.BoxGeometry( window.innerWidth, window.innerHeight*15,30), new THREE.MeshBasicMaterial( {map: new THREE.TextureLoader().load('pz.png')} ) );
+scene.add(sky);
+sky.position.set(-200, h0, -100);
 
 //ground
-const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 15, 50), new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('grsass.jpg')}));
+const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 35, 30), new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('grass1.png')}));
 scene.add(ground);
-ground.position.set(0,-15/2,-200);
+ground.position.set(0,-35/2,-100);
 
-function rho(preY){
-  return (1.225 * Math.pow((1 - 0.0065 * preY / 288.15), (9.81 / (287.05 * 0.0065) - 1)));
+
+
+//حساب مساحة المظلة 
+function swathe_parachute (radius){
+  return (3.14*radius*radius)/10000;
 }
-
-function drag(rho, preV, k, s){
-  return 1/2 * rho * preV * k * s;
+//حساب حجم المظلة 
+function volume_parachute(radius){
+  return ((2/3)*3.14*radius*radius*radius)/1000000;
 }
-
-function forces(fr,w){
-  return  w - fr;
+//حساب كتلة المظلة 
+function m_parachutee(roh,radius){
+  return roh*volume_parachute(radius);
+}
+//حساب مقاومة الهواء 
+function fr(k,s,v){
+return 0.5*k*1*s*v*v;
+}
+//محصلة القوى 
+function sigma(k,s,v,w){
+  return w - fr(k,s,v);
 }
 
 function openParachute() {
   isParachuteOpened = true;
-  s = 25;
-  k = 0.5;
+  s = swathe_parachute(radius);
+  k = 1.5;
   skydiver.material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 }
-
 //keyboard state
 var keyboard = {};
 
@@ -112,28 +142,26 @@ window.addEventListener('keyup', function (event) {
 //keyboard input
 function handleKeyboardInput() {
   // Check if key is pressed
-
-  if (keyboard['KeyW']) {
-    // Do something
-  }
-
-  if (keyboard['KeyA']) {
-    // Do something
-  }
-
-  if (keyboard['KeyD']) {
-    // Do something
-  }
-
-  if (keyboard['KeyS']) {
-    // Do something
-  }
-
   if (keyboard['KeyP']) {
     isSimRunning = true;
     inputPanel.hide();
     outputPanel.domElement.style.display = "block";
-    helicopter.position.y = input.altitude_m;
+    skydiver.position.y=input.altitude_m;
+    helicopter.position.y = input.altitude_m; 
+    camera.position.y=input.altitude_m;
+    h0=input.altitude_m;
+    y=input.altitude_m;
+    k=input.k;
+    g=input.gravity;
+    m_skydriver=input.mass_kg;
+    roh_parachute=input.roh_parachute;
+    radius=input.radius_parachute;
+    //حساب الكتلة الكلية
+    m_parachute=m_parachutee(roh_parachute,radius);
+    m_total=(m_parachute) + m_skydriver;
+    console.log('m='+m_total);
+//حساب قوة الثقل 
+   w = m_total*g;
   }
 
   if (keyboard['KeyQ']) {
@@ -141,20 +169,26 @@ function handleKeyboardInput() {
   }
 }
 
+
+
+
 //function that repeats 60 times every second
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   handleKeyboardInput();
   
-  if(input.altitude_m > 0 && isSimRunning ){
-    
-    a = forces(drag(rho(y0), v0, k, s), w) / input.mass_kg;
+  if(input.altitude_m > 0 && isSimRunning && y>0){
+     a = sigma(k,s,v0,w)/m_total;
+    console.log("a="+a);
+    console.log("s="+s);
     output.velocity_mps = v0 + (a * 0.016);
-    y= h0 - (y0 +( output.velocity_mps * 0.016));
+   y= h0 - (y0 +( output.velocity_mps * 0.016));
     console.log("a = "+ a);
     skydiver.position.y = output.y_m;
     output.y_m =y;
+    
+   
     
     if(output.y_m > 40) camera.position.y = output.y_m - 20;
     
