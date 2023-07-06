@@ -151,7 +151,7 @@ function animate() {
     
     a = forces(drag(rho(y0), v0, k, s), w) / input.mass_kg;
     output.velocity_mps = v0 + (a * 0.016);
-   y= h0 - (y0 +( output.velocity_mps * 0.016));
+    y= h0 - (y0 +( output.velocity_mps * 0.016));
     console.log("a = "+ a);
     skydiver.position.y = output.y_m;
     output.y_m =y;
