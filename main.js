@@ -81,7 +81,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 
-// Create a helicopter model
+/* Create a helicopter model
 var helicopter;
 var loader = new GLTFLoader();
 loader.load('./helicopter_model/scene.gltf', function (gltf) {
@@ -89,8 +89,12 @@ loader.load('./helicopter_model/scene.gltf', function (gltf) {
   helicopter.position.set(-200, h0, 0);
   helicopter.scale.set(10, 10, 10);
   scene.add(helicopter);
-});
+});*/
 
+// helicopter photo
+const helicopter = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight * 15, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('helicopter.png') }));
+scene.add(helicopter);
+helicopter.position.set(-200, h0, 0);
 
 
 
