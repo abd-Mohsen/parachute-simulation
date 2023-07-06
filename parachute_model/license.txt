@@ -1,0 +1,11 @@
+Model Information:
+* title:	Parachute
+* source:	https://sketchfab.com/3d-models/parachute-5d8d8ce398664bcf8c5a38c00dcd183f
+* author:	Woody's Games (https://sketchfab.com/woodysgames)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Parachute" (https://sketchfab.com/3d-models/parachute-5d8d8ce398664bcf8c5a38c00dcd183f) by Woody's Games (https://sketchfab.com/woodysgames) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
