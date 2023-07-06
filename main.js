@@ -92,9 +92,18 @@ loader.load('./helicopter_model/scene.gltf', function (gltf) {
 });*/
 
 // helicopter photo
-const helicopter = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight * 15, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('helicopter.png') }));
-scene.add(helicopter);
-helicopter.position.set(-200, h0, 0);
+var width = 10;
+var height = 10;
+
+var textureLoader = new THREE.TextureLoader();
+textureLoader.load('helicopter.png', function (texture) {
+  var material = new THREE.MeshBasicMaterial({ map: texture });
+  var geometry = new THREE.PlaneGeometry(width, height);
+  var mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+  mesh.position.set(-200, h0, 0);
+});
+
 
 
 
