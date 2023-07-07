@@ -1,19 +1,20 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 
 
 
-const inputPanel = new dat.GUI({width:1220});
+const inputPanel = new dat.GUI({ width: 1220 });
 const outputPanel = new dat.GUI();
 
 const input = {
-    altitude_m: 0,
-    mass_kg:40,
-    roh_parachute:1.1,
-    radius_parachute:50,
-    k:0.7,
-    gravity:9.81,
+  altitude_m: 0,
+  mass_kg: 40,
+  roh_parachute: 1.1,
+  radius_parachute: 50,
+  k: 0.7,
+  gravity: 9.81,
 };
 
 const output = {
@@ -26,17 +27,17 @@ const output = {
 
 
 //لوحة الدخل
-inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).onChange(()=>{
-skydiver.position.y=input.altitude_m;
-helicopter.position.y=input.altitude_m;
-camera.position.y=input.altitude_m;
+inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).onChange(() => {
+  skydiver.position.y = input.altitude_m;
+  helicopter.position.y = input.altitude_m;
+  camera.position.y = input.altitude_m;
 
 }); //1066m to 5486m irl
-inputPanel.add(input,'radius_parachute',50,450).step(1);
-inputPanel.add(input,'roh_parachute',1.1,2.6).step(0.1),
-inputPanel.add(input,'k',0.7,1.4).step(0.1),
-inputPanel.add(input, 'mass_kg', 40, 120);
-inputPanel.add(input,'gravity',0,20).step(0.1);
+inputPanel.add(input, 'radius_parachute', 50, 450).step(1);
+inputPanel.add(input, 'roh_parachute', 1.1, 2.6).step(0.1),
+  inputPanel.add(input, 'k', 0.7, 1.4).step(0.1),
+  inputPanel.add(input, 'mass_kg', 40, 120);
+inputPanel.add(input, 'gravity', 0, 20).step(0.1);
 
 //لوحة الخرج
 outputPanel.add(output, 'velocity_mps');
@@ -48,29 +49,29 @@ outputPanel.hide();
 
 let isSimRunning = false;
 let isParachuteOpened = false;
-let h0=input.altitude_m;
+let h0 = input.altitude_m;
 let g = 9.81; // m/s^2 
 let m_skydriver = input.mass_kg;
-let m_parachute=10;
-let m_total=50;
-let k = 1 ;
-let roh_parachute=2;
+let m_parachute = 10;
+let m_total = 50;
+let k = 1;
+let roh_parachute = 2;
 let s = 0.36;
-let radius=10 ;
+let radius = 10;
 let a = 0;
 let y0 = 0;
 let v0 = 0;
-let v=0;
-let y=h0;
-let w=10;
+let v = 0;
+let y = h0;
+let w = 10;
 
 //scene
 const scene = new THREE.Scene();
 
 
 //camera
-const camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 0.1, 200);
-camera.position.set(-150,h0,20);
+const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 200);
+camera.position.set(-150, h0, 20);
 camera.zoom = 10;
 camera.updateProjectionMatrix();
 
@@ -79,53 +80,81 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-//helicopter aka grey box
+
+// Create a helicopter model
+var helicopter;
+var loader = new GLTFLoader();
+loader.load('./helicopter_model/scene.gltf', function (gltf) {
+  helicopter = gltf.scene;
+  helicopter.position.set(-200, h0, 0);
+  helicopter.scale.set(10, 10, 10);
+  scene.add(helicopter);
+});
+
+
+
+
+/*helicopter aka grey box
 const helicopter = new THREE.Mesh( new THREE.BoxGeometry( 30, 6), new THREE.MeshBasicMaterial( { color: 0x555555 } ) );
 scene.add(helicopter);
-helicopter.position.set(-200, h0, 0);
+helicopter.position.set(-200, h0, 0);*/
 
-//skydiver aka red box
-const skydiver = new THREE.Mesh( new THREE.BoxGeometry( 2, 1 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
+
+
+/*skydiver aka red box
+const skydiver = new THREE.Mesh(new THREE.BoxGeometry(2, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
 scene.add(skydiver);
-skydiver.position.set(-200, h0, 0);
+skydiver.position.set(-200, h0, 0);*/
+
+// Create a skydiver model
+var skydiver;
+loader.load('./skydiver_model/scene.gltf', function (gltf) {
+  skydiver = gltf.scene;
+  skydiver.visible = false; // Hide the skydiver initially
+  skydiver.position.set(-200, h0, 0);
+  //skydiver.scale.set(0.5, 0.5, 0.5);
+  scene.add(skydiver);
+});
+
+
 //box
-const sky = new THREE.Mesh( new THREE.BoxGeometry( window.innerWidth, window.innerHeight*15,30), new THREE.MeshBasicMaterial( {map: new THREE.TextureLoader().load('pz.png')} ) );
+const sky = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight * 15, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('pz.png') }));
 scene.add(sky);
 sky.position.set(-200, h0, -100);
 
 //ground
-const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 35, 30), new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('grass1.png')}));
+const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 35, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('grass1.png') }));
 scene.add(ground);
-ground.position.set(0,-35/2,-100);
+ground.position.set(0, -35 / 2, -100);
 
 
 
 //حساب مساحة المظلة 
-function swathe_parachute (radius){
-  return (3.14*radius*radius)/10000;
+function swathe_parachute(radius) {
+  return (3.14 * radius * radius) / 10000;
 }
 //حساب حجم المظلة 
-function volume_parachute(radius){
-  return ((2/3)*3.14*radius*radius*radius)/1000000;
+function volume_parachute(radius) {
+  return ((2 / 3) * 3.14 * radius * radius * radius) / 1000000;
 }
 //حساب كتلة المظلة 
-function m_parachutee(roh,radius){
-  return roh*volume_parachute(radius);
+function m_parachutee(roh, radius) {
+  return roh * volume_parachute(radius);
 }
 //حساب مقاومة الهواء 
-function fr(k,s,v){
-return 0.5*k*1*s*v*v;
+function fr(k, s, v) {
+  return 0.5 * k * 1 * s * v * v;
 }
 //محصلة القوى 
-function sigma(k,s,v,w){
-  return w - fr(k,s,v);
+function sigma(k, s, v, w) {
+  return w - fr(k, s, v);
 }
 
 function openParachute() {
   isParachuteOpened = true;
   s = swathe_parachute(radius);
   k = 1.5;
-  skydiver.material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+  skydiver.material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 }
 //keyboard state
 var keyboard = {};
@@ -146,22 +175,22 @@ function handleKeyboardInput() {
     isSimRunning = true;
     inputPanel.hide();
     outputPanel.domElement.style.display = "block";
-    skydiver.position.y=input.altitude_m;
-    helicopter.position.y = input.altitude_m; 
-    camera.position.y=input.altitude_m;
-    h0=input.altitude_m;
-    y=input.altitude_m;
-    k=input.k;
-    g=input.gravity;
-    m_skydriver=input.mass_kg;
-    roh_parachute=input.roh_parachute;
-    radius=input.radius_parachute;
+    skydiver.position.y = input.altitude_m;
+    helicopter.position.y = input.altitude_m;
+    camera.position.y = input.altitude_m;
+    h0 = input.altitude_m;
+    y = input.altitude_m;
+    k = input.k;
+    g = input.gravity;
+    m_skydriver = input.mass_kg;
+    roh_parachute = input.roh_parachute;
+    radius = input.radius_parachute;
     //حساب الكتلة الكلية
-    m_parachute=m_parachutee(roh_parachute,radius);
-    m_total=(m_parachute) + m_skydriver;
-    console.log('m='+m_total);
-//حساب قوة الثقل 
-   w = m_total*g;
+    m_parachute = m_parachutee(roh_parachute, radius);
+    m_total = (m_parachute) + m_skydriver;
+    console.log('m=' + m_total);
+    //حساب قوة الثقل 
+    w = m_total * g;
   }
 
   if (keyboard['KeyQ']) {
@@ -177,24 +206,23 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   handleKeyboardInput();
-  
-  if(input.altitude_m > 0 && isSimRunning && y>0){
-     a = sigma(k,s,v0,w)/m_total;
-    console.log("a="+a);
-    console.log("s="+s);
+
+  if (input.altitude_m > 0 && isSimRunning && y > 0) {
+    a = sigma(k, s, v0, w) / m_total;
+    console.log("a=" + a);
+    console.log("s=" + s);
     output.velocity_mps = v0 + (a * 0.016);
    y= h0 - (y0 +( output.velocity_mps * 0.016));
-    console.log("a = "+ a);
     skydiver.position.y = output.y_m;
-    output.y_m =y;
-    
-   
-    
-    if(output.y_m > 40) camera.position.y = output.y_m - 20;
-    
-    if(output.y_m > 0) output.time_s += 0.016;
+    output.y_m = y;
 
-    y0 = y0 +( output.velocity_mps * 0.016);
+
+
+    if (output.y_m > 40) camera.position.y = output.y_m - 20;
+
+    if (output.y_m > 0) output.time_s += 0.016;
+
+    y0 = y0 + (output.velocity_mps * 0.016);
     v0 = output.velocity_mps;
   }
   outputPanel.updateDisplay();

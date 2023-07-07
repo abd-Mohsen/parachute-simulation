@@ -1,0 +1,11 @@
+Model Information:
+* title:	Bell206 Helicopter
+* source:	https://sketchfab.com/3d-models/bell206-helicopter-0d0455b7fbe04fb9a66886f306f8ae22
+* author:	kuuvalas (https://sketchfab.com/kuuvalas)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Bell206 Helicopter" (https://sketchfab.com/3d-models/bell206-helicopter-0d0455b7fbe04fb9a66886f306f8ae22) by kuuvalas (https://sketchfab.com/kuuvalas) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
