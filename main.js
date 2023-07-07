@@ -81,15 +81,28 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 
-// Create a helicopter model
+//Create a helicopter model
 var helicopter;
 var loader = new GLTFLoader();
 loader.load('./helicopter_model/scene.gltf', function (gltf) {
   helicopter = gltf.scene;
   helicopter.position.set(-200, h0, 0);
-  helicopter.scale.set(10, 10, 10);
+  helicopter.scale.set(15, 15, 15);
   scene.add(helicopter);
 });
+
+// // helicopter photo
+// var width = 10;
+// var height = 10;
+
+// var textureLoader = new THREE.TextureLoader();
+// textureLoader.load('helicopter.png', function (texture) {
+//   var material = new THREE.MeshBasicMaterial({ map: texture });
+//   var geometry = new THREE.PlaneGeometry(width, height);
+//   var mesh = new THREE.Mesh(geometry, material);
+//   scene.add(mesh);
+//   mesh.position.set(-200, h0, 0);
+// });
 
 
 
@@ -110,10 +123,20 @@ skydiver.position.set(-200, h0, 0);*/
 var skydiver;
 loader.load('./skydiver_model/scene.gltf', function (gltf) {
   skydiver = gltf.scene;
-  skydiver.visible = false; // Hide the skydiver initially
-  skydiver.position.set(-200, h0, 0);
-  //skydiver.scale.set(0.5, 0.5, 0.5);
+  
+  skydiver.position.set(-199, h0, 0);
+  skydiver.scale.set(0.5,0.5,0.5);
+  skydiver.rotation.z=Math.PI/2;
   scene.add(skydiver);
+});
+//creat parachut model
+var parachute;
+loader.load('./parachute_model/scene.gltf', function (gltf) {
+  parachute = gltf.scene;
+  parachute.visible=false;
+  parachute.position.set(-202, h0+4, 0);
+  parachute.scale.set(1,1,1);
+  scene.add(parachute);
 });
 
 
@@ -152,9 +175,13 @@ function sigma(k, s, v, w) {
 
 function openParachute() {
   isParachuteOpened = true;
+  parachute.visible=true;
+  skydiver.rotation.z= 2*(Math.PI);
+  skydiver.position.x=-202;
   s = swathe_parachute(radius);
   k = 1.5;
-  skydiver.material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+ 
+ // skydiver.material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 }
 //keyboard state
 var keyboard = {};
@@ -214,6 +241,7 @@ function animate() {
     output.velocity_mps = v0 + (a * 0.016);
    y= h0 - (y0 +( output.velocity_mps * 0.016));
     skydiver.position.y = output.y_m;
+    parachute.position.y=output.y_m;
     output.y_m = y;
 
 
