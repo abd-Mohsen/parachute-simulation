@@ -31,6 +31,7 @@ inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).onChange(() => {
   skydiver.position.y = input.altitude_m;
   helicopter.position.y = input.altitude_m;
   camera.position.y = input.altitude_m;
+  light.position.y=input.altitude_m;
 
 }); //1066m to 5486m irl
 inputPanel.add(input, 'radius_parachute', 50, 450).step(1);
@@ -64,6 +65,11 @@ let v0 = 0;
 let v = 0;
 let y = h0;
 let w = 10;
+let vx=1;
+let x0=0;
+let x=0;
+let tx=0;
+let tt=0;
 
 //scene
 const scene = new THREE.Scene();
@@ -71,7 +77,7 @@ const scene = new THREE.Scene();
 
 //camera
 const camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 200);
-camera.position.set(-150, h0, 20);
+camera.position.set(0, h0, 20);
 camera.zoom = 10;
 camera.updateProjectionMatrix();
 
@@ -81,51 +87,31 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 
+// إضافة المصدر الضوئي
+const color = 0xFFFFFF; // لون الضوء
+const intensity = 5; // شدة الضوء
+const light = new THREE.PointLight(color, intensity);
+light.position.set(-2, h0, 50); // تحديد موقع المصدر الضوئي
+scene.add(light);
+
 //Create a helicopter model
 var helicopter;
 var loader = new GLTFLoader();
 loader.load('./helicopter_model/scene.gltf', function (gltf) {
   helicopter = gltf.scene;
-  helicopter.position.set(-200, h0, 0);
+  helicopter.position.set(0, h0, 0);
   helicopter.scale.set(15, 15, 15);
   scene.add(helicopter);
 });
 
-// // helicopter photo
-// var width = 10;
-// var height = 10;
-
-// var textureLoader = new THREE.TextureLoader();
-// textureLoader.load('helicopter.png', function (texture) {
-//   var material = new THREE.MeshBasicMaterial({ map: texture });
-//   var geometry = new THREE.PlaneGeometry(width, height);
-//   var mesh = new THREE.Mesh(geometry, material);
-//   scene.add(mesh);
-//   mesh.position.set(-200, h0, 0);
-// });
-
-
-
-
-/*helicopter aka grey box
-const helicopter = new THREE.Mesh( new THREE.BoxGeometry( 30, 6), new THREE.MeshBasicMaterial( { color: 0x555555 } ) );
-scene.add(helicopter);
-helicopter.position.set(-200, h0, 0);*/
-
-
-
-/*skydiver aka red box
-const skydiver = new THREE.Mesh(new THREE.BoxGeometry(2, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-scene.add(skydiver);
-skydiver.position.set(-200, h0, 0);*/
 
 // Create a skydiver model
 var skydiver;
 loader.load('./skydiver_model/scene.gltf', function (gltf) {
   skydiver = gltf.scene;
   
-  skydiver.position.set(-199, h0, 0);
-  skydiver.scale.set(0.5,0.5,0.5);
+  skydiver.position.set(-1, h0, 0);
+  skydiver.scale.set(0.6,0.6,0.6);
   skydiver.rotation.z=Math.PI/2;
   scene.add(skydiver);
 });
@@ -134,7 +120,7 @@ var parachute;
 loader.load('./parachute_model/scene.gltf', function (gltf) {
   parachute = gltf.scene;
   parachute.visible=false;
-  parachute.position.set(-202, h0+4, 0);
+  parachute.position.set(-2, h0+4, 0);
   parachute.scale.set(1,1,1);
   scene.add(parachute);
 });
@@ -143,7 +129,7 @@ loader.load('./parachute_model/scene.gltf', function (gltf) {
 //box
 const sky = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight * 15, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('pz.png') }));
 scene.add(sky);
-sky.position.set(-200, h0, -100);
+sky.position.set(0, h0, -100);
 
 //ground
 const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 35, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('grass1.png') }));
@@ -172,16 +158,19 @@ function fr(k, s, v) {
 function sigma(k, s, v, w) {
   return w - fr(k, s, v);
 }
+function v_after_land(v0,t0){
+  return v0-(0.6*g*t0);
+}
 
 function openParachute() {
   isParachuteOpened = true;
   parachute.visible=true;
   skydiver.rotation.z= 2*(Math.PI);
-  skydiver.position.x=-202;
+  skydiver.position.x=-2;
   s = swathe_parachute(radius);
   k = 1.5;
  
- // skydiver.material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+ 
 }
 //keyboard state
 var keyboard = {};
@@ -233,8 +222,10 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   handleKeyboardInput();
-
-  if (input.altitude_m > 0 && isSimRunning && y > 0) {
+  
+  if (input.altitude_m > 0 && isSimRunning && vx>0.1) {
+    
+    if (output.y_m>=0) {
     a = sigma(k, s, v0, w) / m_total;
     console.log("a=" + a);
     console.log("s=" + s);
@@ -242,17 +233,45 @@ function animate() {
    y= h0 - (y0 +( output.velocity_mps * 0.016));
     skydiver.position.y = output.y_m;
     parachute.position.y=output.y_m;
+    light.position.y=output.y_m;
     output.y_m = y;
-
+    console.log("y="+y);
 
 
     if (output.y_m > 40) camera.position.y = output.y_m - 20;
 
-    if (output.y_m > 0) output.time_s += 0.016;
+    if (output.y_m > 0) {output.time_s += 0.016;
+      tt=output.time_s;
+    }    
+    
+
 
     y0 = y0 + (output.velocity_mps * 0.016);
     v0 = output.velocity_mps;
+    
+
   }
+  else{
+    vx=v_after_land(v0,tx);
+    console.log(v_after_land(v0,tx));
+    x = x0 + (vx * 0.016);
+    x0 = x0 + (vx* 0.016);
+    tx+=0.016;
+    output.time_s =tt+ tx;
+    output.x_m=x;
+    output.velocity_mps=vx;
+     camera.position.x = x;
+     skydiver.position.x=x;
+     parachute.rotation.z=(Math.PI)/2;
+     parachute.position.x=x;
+    console.log("tx="+tx);
+    
+    console.log("x="+x);
+    console.log("vx="+vx);
+  
+  }
+}
+ 
   outputPanel.updateDisplay();
   //cancelAnimationFrame(animationId);
 }
@@ -270,10 +289,6 @@ window.addEventListener('resize', function () {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
-
-// k = 1 for an average skydiver in a belly-to-earth position | k = 0.5 for an average rounded parachute
-// s = 0.8 for an average skydiver in a belly-to-earth position | s = 25  for an average rounded parachute
-// rho = 1.225 * (1 - 0.0065 * input.altitude_m / 288.15)^(9.81 / (287.05 * 0.0065) - 1)
 
 
 
