@@ -15,6 +15,7 @@ const input = {
   radius_parachute: 50,
   k: 0.7,
   gravity: 9.81,
+  thik:15,
 };
 
 const output = {
@@ -39,6 +40,9 @@ inputPanel.add(input, 'roh_parachute', 1.1, 2.6).step(0.1),
   inputPanel.add(input, 'k', 0.7, 1.4).step(0.1),
   inputPanel.add(input, 'mass_kg', 40, 120);
 inputPanel.add(input, 'gravity', 0, 20).step(0.1);
+inputPanel.add(input, 'thik' ,15,50).step(5).onChange(()=>{
+  r=input.thik;
+});
 
 //لوحة الخرج
 outputPanel.add(output, 'velocity_mps');
@@ -56,8 +60,8 @@ let m_skydriver = input.mass_kg;
 let m_parachute = 10;
 let m_total = 50;
 let k = 1;
-let roh_parachute = 2;
-let s = 0.36;
+let roh_parachute = input.roh_parachute;
+let s = 0.8;
 let radius = 10;
 let a = 0;
 let y0 = 0;
@@ -70,6 +74,8 @@ let x0=0;
 let x=0;
 let tx=0;
 let tt=0;
+let r=input.thik;
+let R=0;
 
 //scene
 const scene = new THREE.Scene();
@@ -144,8 +150,9 @@ function swathe_parachute(radius) {
 }
 //حساب حجم المظلة 
 function volume_parachute(radius) {
-  return ((2 / 3) * 3.14 * radius * radius * radius) / 1000000;
+  return ((2 / 3) * 3.14 * ((radius*radius*radius)-(R*R*R))) / 1000000;
 }
+
 //حساب كتلة المظلة 
 function m_parachutee(roh, radius) {
   return roh * volume_parachute(radius);
@@ -201,10 +208,13 @@ function handleKeyboardInput() {
     m_skydriver = input.mass_kg;
     roh_parachute = input.roh_parachute;
     radius = input.radius_parachute;
+    R=radius-r;
     //حساب الكتلة الكلية
     m_parachute = m_parachutee(roh_parachute, radius);
     m_total = (m_parachute) + m_skydriver;
-    console.log('m=' + m_total);
+    console.log('m_parachute=' + m_parachute);
+    console.log("m_total="+m_total);
+    console.log("R="+R);
     //حساب قوة الثقل 
     w = m_total * g;
   }
