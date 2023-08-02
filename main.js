@@ -461,6 +461,10 @@ function animate() {
 
   }
   else{
+    if(v0<=8.94){output.status="الهبوط امن";}
+    if(8.94<v0<=17.88){output.status='اصابة خطرة'}
+    if(v0>17.88){output.status='الموت'}
+    
     vx=v_after_land(v0,tx);
     output.mv=(0.6*g*tx);
     console.log(v_after_land(v0,tx));
