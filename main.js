@@ -32,7 +32,6 @@ inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).onChange(() => {
   helicopter.position.y = input.altitude_m;
   camera.position.y = input.altitude_m;
   light.position.y=input.altitude_m;
-
 }); //1066m to 5486m irl
 inputPanel.add(input, 'radius_parachute', 50, 450).step(1);
 inputPanel.add(input, 'roh_parachute', 1.1, 2.6).step(0.1),
@@ -88,10 +87,10 @@ document.body.appendChild(renderer.domElement);
 
 
 // إضافة المصدر الضوئي
-const color = 0xFFFFFF; // لون الضوء
-const intensity = 5; // شدة الضوء
+const color = 0xFFFFFF; 
+const intensity = 5; 
 const light = new THREE.PointLight(color, intensity);
-light.position.set(-2, h0, 50); // تحديد موقع المصدر الضوئي
+light.position.set(-2, h0, 50); 
 scene.add(light);
 
 //Create a helicopter model
@@ -104,7 +103,6 @@ loader.load('./helicopter_model/scene.gltf', function (gltf) {
   scene.add(helicopter);
 });
 
-
 // Create a skydiver model
 var skydiver;
 loader.load('./skydiver_model/scene.gltf', function (gltf) {
@@ -115,6 +113,7 @@ loader.load('./skydiver_model/scene.gltf', function (gltf) {
   skydiver.rotation.z=Math.PI/2;
   scene.add(skydiver);
 });
+
 //creat parachut model
 var parachute;
 loader.load('./parachute_model/scene.gltf', function (gltf) {
@@ -124,6 +123,7 @@ loader.load('./parachute_model/scene.gltf', function (gltf) {
   parachute.scale.set(1,1,1);
   scene.add(parachute);
 });
+// سكري لا تنسى تغير حجم المظلة حسب نصف القطرٍ
 
 
 //box
@@ -135,7 +135,6 @@ sky.position.set(0, h0, -100);
 const ground = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, 35, 30), new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('grass1.png') }));
 scene.add(ground);
 ground.position.set(0, -35 / 2, -100);
-
 
 
 //حساب مساحة المظلة 
@@ -169,9 +168,8 @@ function openParachute() {
   skydiver.position.x=-2;
   s = swathe_parachute(radius);
   k = 1.5;
- 
- 
 }
+
 //keyboard state
 var keyboard = {};
 
@@ -213,8 +211,6 @@ function handleKeyboardInput() {
     openParachute();
   }
 }
-
-
 
 
 //function that repeats 60 times every second
