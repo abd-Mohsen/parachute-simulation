@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 
 const inputPanel = new dat.GUI({width: 300 });
-const outputPanel = new dat.GUI();
+const outputPanel = new dat.GUI({width:400});
 // // إنشاء كائن GUI جديد
  var gui = new dat.GUI();
 gui.domElement.style.position='fixed';
@@ -153,22 +153,22 @@ inputPanel.add(input,'per_wid',3,200).step(1).name("عرض الشخص  بال س
 inputPanel.add(input,'per_thik',5,200).step(1).name("ثخانة الشخص بال سم ");
 //لوحة الخرج
 
-outputPanel.add(output, 'time_s').name('الزمن الحالي');
-outputPanel.add(output, 'velocity_mps').name("السرعة");
-outputPanel.add(output, 'y_m').name(' yموضع الجسم الحالي على ');
-outputPanel.add(output, 'x_m').name('xموضع الجسم الحالي على+');
-outputPanel.add(output,'fr' ).step(0.001).name('قوة مقاومة الهواء');
-outputPanel.add(output, 'mg').step(0.001).name('قوة الثقالة ');
-outputPanel.add(output, 'sigma').step(0.1).name('محصلة القوى');
+outputPanel.add(output, 'time_s').name(' الزمن الحالي بالثانية');
+outputPanel.add(output, 'velocity_mps').name(" السرعة متر/ثانية^2");
+outputPanel.add(output, 'y_m').name(' بالمترyموضع الجسم الحالي على ');
+outputPanel.add(output, 'x_m').name(' بالمترxموضع الجسم الحالي على');
+outputPanel.add(output,'fr' ).step(0.001).name('Nقوة مقاومة الهواء');
+outputPanel.add(output, 'mg').step(0.001).name(' Nقوة الثقالة ');
+outputPanel.add(output, 'sigma').step(0.1).name('Nمحصلة القوى');
 outputPanel.add(output, 'mv').step(0.1).name('تناقص السرعة ');
-outputPanel.add(output,'statle').step(0.001).name('مساحة السطح المجابه للهواء');
-outputPanel.add(output, 'sparachute').step(0.001).name('مساحة المظلة ');
-outputPanel.add(output, 'spersone').step(0.001).name('المساحة الحالية للشخص');
-outputPanel.add(output,'mtotal' ).step(0.001).name('الوزن الكلي');
+outputPanel.add(output,'statle').step(0.001).name('مساحة السطح المجابه للهواء بالمتر');
+outputPanel.add(output, 'sparachute').step(0.001).name('مساحة المظلة بالمتر ');
+outputPanel.add(output, 'spersone').step(0.001).name(' المساحة الحالية للشخص بالمتر');
+outputPanel.add(output,'mtotal' ).step(0.001).name('الوزن الكلي بالكيلو');
 outputPanel.add(output,'mparachute' ).step(0.001).name('وزن المظلة');
-outputPanel.add(output,'mpersone' ).step(0.001).name('وزن الشخص');
+outputPanel.add(output,'mpersone' ).step(0.001).name('وزن الشخص بالكيلو');
 outputPanel.add(output,'rohparachute' ).step(0.001).name('الكتلة الحجمية للمظلة ');
-outputPanel.add(output,'vpatachute' ).step(0.00001).name('حجم للمظلة ');
+outputPanel.add(output,'vpatachute' ).step(0.00001).name('حجم المظلة بالمتر^3 ');
 outputPanel.add(output, 'status').name('حالة المظلي بعد الهبوط');
 outputPanel.hide();
 
