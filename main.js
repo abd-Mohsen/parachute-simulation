@@ -1,15 +1,17 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
+import TextSprite from '@seregpie/three.text-sprite';
 
 
 
 const inputPanel = new dat.GUI({width: 300 });
+inputPanel.hide();
 const outputPanel = new dat.GUI({width:400});
 // // إنشاء كائن GUI جديد
  var gui = new dat.GUI();
 gui.domElement.style.position='fixed';
+gui.hide();
 // إنشاء كائن يحتوي على الخيارات التي سيتم عرضها في القائمة المنسدلة
 var options = {
   Option1: function() {
@@ -77,6 +79,7 @@ roh_6: () => {
 };
 const rohs = gui.addFolder('المادة المصنوع منها المظلة ');
 rohs.open();
+rohs.hide();
 
 const output = {
   velocity_mps: 0.0,
@@ -243,6 +246,65 @@ loader.load('./skydiver_model/scene.gltf', function (gltf) {
   skydiver.rotation.z=Math.PI/2;
   scene.add(skydiver);
 });
+
+//شاشة الترحيب
+
+const testt = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight, 30), new THREE.MeshBasicMaterial({ color:0x000000}));
+scene.add(testt);
+testt.position.set(0, 200, -10);
+/////////////////////نص الترحيب
+
+
+let sprite = new TextSprite( {
+                               text: 'هذه محاكاة لهبوط مظلي\n الهدف منها مراقبة تغيير سرعة سقوط المظلي بتغيير ابعاد المظلة و المظلي\n sلذلك لتبدأ بهذه المحاكاة عليك الضغط على \nو من ثم اختيار المدخلات\n و نحيطك علما أن ارتفاع الطائرة من المدخلات الاجبارية فلن تبدا المحاكات اذا كان الارتفاع صفر\n P بعد اختيار المدخلات اضغط  \n Qليبدا المظلي بالسقوط و لفتح المظلة في اي لحظة اضغط',
+                          alignment: 'center',
+                         fontFamily: 'Arial, Helvetica, sans-serif',
+                           fontSize: 4.8,
+                              color: '#FFFFFF' } );
+ sprite.position.set(0,0,10);
+scene.add( sprite );
+//شاشة توقف ناجح
+
+const testt1 = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight, 30), new THREE.MeshBasicMaterial({ color:0x00FF00}));
+scene.add(testt1);
+testt1.position.set(0, 200, -100);
+//////////////////نص توقف ناجح
+
+let sprite1 = new TextSprite( {
+                               text: 'مرحى\nاختيارك موفق فقد هبط المظلي بامان \n مرتينH ولمعرفة مدخلاتك اضغط على  ',
+                          alignment: 'center',
+                         fontFamily: 'Arial, Helvetica, sans-serif',
+                           fontSize: 4.8,
+                              color: '#000000' } );
+ sprite1.position.set(0,0,-100);
+scene.add( sprite1 );
+
+//شاشة توقف غير ناجح 
+
+const testt2 = new THREE.Mesh(new THREE.BoxGeometry(window.innerWidth, window.innerHeight, 30), new THREE.MeshBasicMaterial({ color:0xFF0000}));
+scene.add(testt2);
+testt2.position.set(0, 200, -100);
+//////////////////نص توقف مع اصابة 
+
+let sprite2 = new TextSprite( {
+                               text:'اوبس\nلقد هبط المظلي بسرعة عالية \nفتعرض لاصابة خطرة \n F5مرتين ولاعادة التجربة Hلمعرفة المدخلات و المخرجات اضغط ',
+                          alignment: 'center',
+                         fontFamily: 'Arial, Helvetica, sans-serif',
+                           fontSize: 4.8,
+                              color: '#000000' } );
+ sprite2.position.set(0,0,-100);
+scene.add( sprite2 );
+/////////////////نص توقف مع موت 
+
+let sprite3 = new TextSprite( {
+  text:'للأسف\nلقد هبط المظلي بسرعة هستيرية \nفتعرض للموت \n F5مرتين ولاعادة التجربة Hلمعرفة المدخلات و المخرجات اضغط ',
+alignment: 'center',
+fontFamily: 'Arial, Helvetica, sans-serif',
+fontSize: 4.8,
+ color: '#000000' } );
+sprite3.position.set(0,0,-100);
+scene.add( sprite3 );
+
 //creat parachut model
 var parachute;
 loader.load('./parachute_model/scene.gltf', function (gltf) {
@@ -383,6 +445,13 @@ window.addEventListener('keyup', function (event) {
 //keyboard input
 function handleKeyboardInput() {
   // Check if key is pressed
+  if(keyboard['KeyS']){
+    testt.position.z=-200;
+    inputPanel.domElement.style.display = "block";
+    rohs.domElement.style.display = "block";
+    gui.domElement.style.display = "block";
+    sprite.position.z=-100;
+  }
   if (keyboard['KeyP']) {
     isSimRunning = true;
     inputPanel.hide();
@@ -461,10 +530,20 @@ function animate() {
 
   }
   else{
-    if(v0<=8.94){output.status="الهبوط امن";}
-    if(8.94<v0<=17.88){output.status='اصابة خطرة'}
-    if(v0>17.88){output.status='الموت'}
-    
+   
+    if(8.94<v0 && v0<=17.88){
+      output.status='اصابة خطرة'
+  testt2.position.z=-10
+  sprite2.position.z=10
+  }
+    if(v0>17.88){output.status='الموت';
+  testt2.position.z=-10;
+  sprite3.position.z=10;
+
+  }
+  else{
+  if(v0<8.94)output.status="الهبوط امن";
+  camera.position.x = x;
     vx=v_after_land(v0,tx);
     output.mv=(0.6*g*tx);
     console.log(v_after_land(v0,tx));
@@ -474,14 +553,18 @@ function animate() {
     output.time_s =tx+tt;
     output.x_m=x;
     output.velocity_mps=vx;
-     camera.position.x = x;
+     
      skydiver.position.x=x;
+     sprite1.position.x=x-2;
+     sprite2.position.x=x-2;
+     sprite3.position.x=x-2;
      parachute.rotation.z=(Math.PI)/2;
      parachute.position.x=x;
-    console.log("tx="+tx);
-    
-    console.log("x="+x);
-    console.log("vx="+vx);
+    if(vx>0&&vx<0.1&&v0<8.94){
+      testt1.position.z=-10;
+      sprite1.position.z=10;
+    }
+  }
   
   }
 }
@@ -489,7 +572,6 @@ function animate() {
   outputPanel.updateDisplay();
   //cancelAnimationFrame(animationId);
 }
-
 animate();
 
 
