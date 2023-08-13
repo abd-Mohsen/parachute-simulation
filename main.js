@@ -246,6 +246,24 @@ loader.load('./skydiver_model/scene.gltf', function (gltf) {
   skydiver.rotation.z=Math.PI/2;
   scene.add(skydiver);
 });
+//creat parachut1 model
+var parachute;
+loader.load('./parachute_model/scene.gltf', function (gltf) {
+  parachute = gltf.scene;
+  parachute.visible=false;
+  parachute.position.set(-2, h0+4, 0);
+  parachute.scale.set(1,1,1);
+  scene.add(parachute);
+});
+//creat parachut2 model
+var parachute1;
+loader.load('./parachute_model3/scene.gltf', function (gltf) {
+  parachute1 = gltf.scene;
+  parachute1.visible=false;
+  parachute1.position.set(-2, h0+10, -1);
+  parachute1.scale.set(1.5,1,1.5);
+  scene.add(parachute1);
+});
 
 //شاشة الترحيب
 
@@ -305,15 +323,6 @@ fontSize: 4.8,
 sprite3.position.set(0,0,-100);
 scene.add( sprite3 );
 
-//creat parachut model
-var parachute;
-loader.load('./parachute_model/scene.gltf', function (gltf) {
-  parachute = gltf.scene;
-  parachute.visible=false;
-  parachute.position.set(-2, h0+4, 0);
-  parachute.scale.set(1,1,1);
-  scene.add(parachute);
-});
 
 
 //sky back ground
@@ -340,43 +349,43 @@ ground.position.set(0, -35 / 2, -100);
 
 //تغيير لون الخيار 
 function changecolor(){
-  if (panlecolor==1){ roh_1.__li.style.backgroundColor = '#FF0022';
+  if (panlecolor==1){ roh_1.__li.style.backgroundColor = '#FF5500';
   roh_2.__li.style.backgroundColor = '#1A1A1A';
   roh_3.__li.style.backgroundColor = '#1A1A1A';
   roh_4.__li.style.backgroundColor = '#1A1A1A';
   roh_5.__li.style.backgroundColor = '#1A1A1A';
   roh_6.__li.style.backgroundColor = '#1A1A1A';
 }
-  else if (panlecolor==2){roh_2.__li.style.backgroundColor = '#FF0022';
+  else if (panlecolor==2){roh_2.__li.style.backgroundColor = '#FF5500';
      roh_1.__li.style.backgroundColor = '#1A1A1A';
      roh_3.__li.style.backgroundColor = '#1A1A1A';
      roh_4.__li.style.backgroundColor = '#1A1A1A';
      roh_5.__li.style.backgroundColor = '#1A1A1A';
      roh_6.__li.style.backgroundColor = '#1A1A1A';}
-  else if (panlecolor==3){roh_3.__li.style.backgroundColor = '#FF0022';
+  else if (panlecolor==3){roh_3.__li.style.backgroundColor = '#FF5500';
   roh_2.__li.style.backgroundColor = '#1A1A1A';
   roh_1.__li.style.backgroundColor = '#1A1A1A';
   roh_4.__li.style.backgroundColor = '#1A1A1A';
   roh_5.__li.style.backgroundColor = '#1A1A1A';
   roh_6.__li.style.backgroundColor = '#1A1A1A';}
-  else if (panlecolor==4){roh_4.__li.style.backgroundColor = '#FF0022';roh_2.__li.style.backgroundColor = '#1A1A1A';
+  else if (panlecolor==4){roh_4.__li.style.backgroundColor = '#FF5500';roh_2.__li.style.backgroundColor = '#1A1A1A';
   roh_3.__li.style.backgroundColor = '#1A1A1A';
   roh_1.__li.style.backgroundColor = '#1A1A1A';
   roh_5.__li.style.backgroundColor = '#1A1A1A';
   roh_6.__li.style.backgroundColor = '#1A1A1A';}
-  else if (panlecolor==5){roh_5.__li.style.backgroundColor = '#FF0022';roh_2.__li.style.backgroundColor = '#1A1A1A';
+  else if (panlecolor==5){roh_5.__li.style.backgroundColor = '#FF5500';roh_2.__li.style.backgroundColor = '#1A1A1A';
   roh_3.__li.style.backgroundColor = '#1A1A1A';
   roh_4.__li.style.backgroundColor = '#1A1A1A';
   roh_1.__li.style.backgroundColor = '#1A1A1A';
   roh_6.__li.style.backgroundColor = '#1A1A1A';}
-  else if (panlecolor==6){roh_6.__li.style.backgroundColor = '#FF0022';roh_2.__li.style.backgroundColor = '#1A1A1A';
+  else if (panlecolor==6){roh_6.__li.style.backgroundColor = '#FF5500';roh_2.__li.style.backgroundColor = '#1A1A1A';
   roh_3.__li.style.backgroundColor = '#1A1A1A';
   roh_4.__li.style.backgroundColor = '#1A1A1A';
   roh_5.__li.style.backgroundColor = '#1A1A1A';
   roh_1.__li.style.backgroundColor = '#1A1A1A';}
-  else if(panlecolor==11){opstion_1.__li.style.backgroundColor = '#FF0022';
+  else if(panlecolor==11){opstion_1.__li.style.backgroundColor = '#FF5500';
   opstion_2.__li.style.backgroundColor = '#1A1A1A';}
-  else if(panlecolor==22){opstion_2.__li.style.backgroundColor = '#FF0022';
+  else if(panlecolor==22){opstion_2.__li.style.backgroundColor = '#FF5500';
   opstion_1.__li.style.backgroundColor = '#1A1A1A';}
   else return;
 }
@@ -419,7 +428,9 @@ function v_after_land(v0,t0){
 
 function openParachute() {
   isParachuteOpened = true;
-  parachute.visible=true;
+  if(shape_of_parachute==false)
+  parachute1.visible=true;
+  else parachute.visible=true;
   skydiver.rotation.z= 2*(Math.PI);
   skydiver.position.x=-2;
   s = swathe_parachute(radius);
@@ -511,6 +522,7 @@ function animate() {
     y = h0 - (y0 + (output.velocity_mps * 0.016));
     skydiver.position.y = output.y_m;
     parachute.position.y=output.y_m;
+    parachute1.position.y=output.y_m;
     light.position.y=output.y_m;
     output.y_m = y;
     console.log("y="+y);
@@ -560,6 +572,8 @@ function animate() {
      sprite3.position.x=x-2;
      parachute.rotation.z=(Math.PI)/2;
      parachute.position.x=x;
+     parachute1.rotation.z=(Math.PI)/2;
+     parachute1.position.x=x;
     if(vx>0&&vx<0.1&&v0<8.94){
       testt1.position.z=-10;
       sprite1.position.z=10;
