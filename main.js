@@ -100,6 +100,7 @@ const output = {
   mg:0,
  sigma:0,
  mv:0,
+ h_open_parachute:0,
  
 }
 
@@ -157,9 +158,10 @@ inputPanel.add(input,'per_thik',5,200).step(1).name("ثخانة الشخص با�
 //لوحة الخرج
 
 outputPanel.add(output, 'time_s').name(' الزمن الحالي بالثانية');
-outputPanel.add(output, 'velocity_mps').name(" السرعة متر/ثانية^2");
+outputPanel.add(output, 'velocity_mps').step(0.01).name(" السرعة متر/ثانية^2");
 outputPanel.add(output, 'y_m').name(' بالمترyموضع الجسم الحالي على ');
 outputPanel.add(output, 'x_m').name(' بالمترxموضع الجسم الحالي على');
+outputPanel.add(output, 'h_open_parachute').step(0.1).name('مكان فتح المظلة');
 outputPanel.add(output,'fr' ).step(0.001).name('Nقوة مقاومة الهواء');
 outputPanel.add(output, 'mg').step(0.001).name(' Nقوة الثقالة ');
 outputPanel.add(output, 'sigma').step(0.1).name('Nمحصلة القوى');
@@ -438,6 +440,7 @@ function openParachute() {
   output.spersone=(input.per_wid*input.per_thik)/10000;
   output.statle=(s)+((input.per_wid*input.per_thik)/10000);
   k = 1.5;
+  output.h_open_parachute=y;
  
  
 }
