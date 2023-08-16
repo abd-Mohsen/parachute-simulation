@@ -142,6 +142,9 @@ inputPanel.add(input, 'altitude_m', 0, 5486).step(0.01).name("ارتفاع ال�
   helicopter.position.y = input.altitude_m;
   camera.position.y = input.altitude_m;
   light.position.y=input.altitude_m;
+  spiner.position.y=input.altitude_m+7;
+  rota=rota+0.5;
+
 
 });
 inputPanel.add(input, 'radius_parachute', 50, 450).step(1).name(" نصف قطر المظلة بال سم");
@@ -205,6 +208,7 @@ let tx=0;
 let tt=0;
 let r=input.thik;
 let R=0;
+let rota=0;
 
 //scene
 const scene = new THREE.Scene();
@@ -238,6 +242,14 @@ loader.load('./helicopter_model/scene.gltf', function (gltf) {
   helicopter.scale.set(15, 15, 15);
   scene.add(helicopter);
 });
+//helicopter spiner
+var spiner = new THREE.Mesh( new THREE.BoxGeometry( 20, 1, 2 ), new THREE.MeshBasicMaterial( { color: 0xCF0333 } ) );
+scene.add(spiner);
+spiner.position.set(2, 7, -50);
+
+
+
+
 
 
 // Create a skydiver model
@@ -472,6 +484,8 @@ function handleKeyboardInput() {
   if (keyboard['KeyP']) {
     isSimRunning = true;
     inputPanel.hide();
+    gui.hide();
+    rohs.hide();
     outputPanel.domElement.style.display = "block";
     skydiver.position.y = input.altitude_m;
     helicopter.position.y = input.altitude_m;
@@ -504,6 +518,7 @@ function handleKeyboardInput() {
 
   if (keyboard['KeyQ']) {
     openParachute();
+   
   }
 }
 
@@ -516,6 +531,8 @@ function animate() {
   renderer.render(scene, camera);
   handleKeyboardInput();
   
+  spiner.rotation.y=rota+(Math.PI)/2;
+  rota=rota+0.12;
   if (input.altitude_m > 0 && isSimRunning && vx>0.1) {
     
     if (output.y_m>=0) {
@@ -532,6 +549,7 @@ function animate() {
     light.position.y=output.y_m;
     output.y_m = y;
     console.log("y="+y);
+    
 
 
     if (output.y_m > 40) camera.position.y = output.y_m - 20;
