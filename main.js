@@ -101,6 +101,7 @@ const output = {
  sigma:0,
  mv:0,
  h_open_parachute:0,
+ t_open:0,
  
 }
 
@@ -162,6 +163,7 @@ outputPanel.add(output, 'velocity_mps').step(0.01).name(" السرعة متر/ث
 outputPanel.add(output, 'y_m').name(' بالمترyموضع الجسم الحالي على ');
 outputPanel.add(output, 'x_m').name(' بالمترxموضع الجسم الحالي على');
 outputPanel.add(output, 'h_open_parachute').step(0.1).name('مكان فتح المظلة');
+outputPanel.add(output, 't_open').name('زمن فتح المظلة');
 outputPanel.add(output,'fr' ).step(0.001).name('Nقوة مقاومة الهواء');
 outputPanel.add(output, 'mg').step(0.001).name(' Nقوة الثقالة ');
 outputPanel.add(output, 'sigma').step(0.1).name('Nمحصلة القوى');
@@ -441,6 +443,7 @@ function openParachute() {
   output.statle=(s)+((input.per_wid*input.per_thik)/10000);
   k = 1.5;
   output.h_open_parachute=y;
+  output.t_open=output.time_s;
  
  
 }
